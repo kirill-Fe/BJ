@@ -191,7 +191,7 @@
         }
 
         #projects-button {
-            display: inline-block; 
+            display: inline-block;
             background-color: #8e44ad;
             color: #fff;
             border: none;
@@ -201,7 +201,7 @@
             border-radius: 5px;
             transition: background-color 0.3s ease;
             margin-top: 20px;
-            text-decoration: none; 
+            text-decoration: none;
         }
 
         #projects-button:hover {
@@ -257,8 +257,8 @@
     <div id="blackjack-game" style="display: none;">
         <div class="top-right-container">
             <div id="capital" style="
-            margin-top: 70px;
-        ">Капитал: <span id="capital-value">10000</span></div>
+            margin-top: 80px;
+        ">Капитал: <span id="capital-value">1000</span></div>
             <button id="ad-button">Смотреть рекламу (+1000)</button>
         </div>
         <button id="back-to-menu">Вернуться в главное меню</button>
@@ -302,8 +302,8 @@
         let dealerScore = 0;
         let gameStarted = false;
         let gameOver = false;
-        let capital = localStorage.getItem('blackjackCapital') ? parseInt(localStorage.getItem('blackjackCapital')) : 10000;
-        let betAmount = 1000;
+        let capital = localStorage.getItem('blackjackCapital') ? parseInt(localStorage.getItem('blackjackCapital')) : 1000;
+        let betAmount = 0;
 
         const suits = ["♥", "♦", "♣", "♠"];
         const values = ["Т", "2", "3", "4", "5", "6", "7", "8", "9", "10", "В", "Д", "К"];
@@ -445,16 +445,26 @@
 
             if (gameOver && messageDiv.textContent === "Перебор! Дилер выиграл.") {
                 capital -= betAmount;
-            }
-
-            if (win) {
-                capital += betAmount ;
             } else if (messageDiv.textContent === "Дилер выиграл!") {
                 capital -= betAmount;
             }
 
+            let winAmount = 0;
+            if (win) {
+                winAmount = betAmount; 
+                capital += winAmount;
+                 alert("Вы выиграли +" + winAmount + "!");
+            }
+              if (messageDiv.textContent === "У дилера перебор! Вы выиграли!") {
+                 winAmount = betAmount;
+                capital += winAmount;
+                 alert("У Дилера перебор! Вы выиграли +" + winAmount + "!");
+            }
+
             localStorage.setItem('blackjackCapital', capital);
             capitalValueSpan.textContent = capital;
+
+
         }
 
         function startGame() {
@@ -514,19 +524,19 @@
 
         startButton.addEventListener("click", startGame);
 
-        adButton.addEventListener("click", () => {
-            capital += 1000;
-            localStorage.setItem('blackjackCapital', capital);
-            capitalValueSpan.textContent = capital;
-            alert("Спасибо за просмотр рекламы! Вам начислено 1000 валюты.");
+      adButton.addEventListener("click", () => {
+    capital += 1000;
+    localStorage.setItem('blackjackCapital', capital);
+    capitalValueSpan.textContent = capital;
+    alert("Спасибо за просмотр рекламы! Вам начислено 1000 валюты.");
 
-            gameOverMessage.style.display = "none";
+    gameOverMessage.style.display = "none";
 
-            hitButton.disabled = false;
-            standButton.disabled = false;
-            startButton.style.display = "none";
-            newGameButton.style.display = "block";
-            gameOver = false;
+    hitButton.disabled = false;
+    standButton.disabled = false;
+    startButton.style.display = "none";
+    newGameButton.style.display = "block";
+    gameOver = false;
         });
 
         startBlackjackButton.addEventListener("click", () => {
