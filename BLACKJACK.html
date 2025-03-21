@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Блэкджек</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #35654d;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #dealer,
+        #player {
+            margin: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            /* Make #player a positioning context */
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        #cards,
+        #dealer-cards {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 80px;
+            height: 120px;
+            border: 2px solid #fff;
+            margin: 5px;
+            text-align: center;
+            font-size: 1.5em;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #367C39;
+        }
+
+        #message {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Стиль для недоступных кнопок */
+        button:disabled {
+            background-color: #808080;
+            cursor: not-allowed;
+            color: #ccc;
+        }
+
+        button:disabled:hover {
+            background-color: #808080;
+        }
+
+        #score {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1em;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        #dealer-score {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        #bet-input {
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100px;
+            margin: 0 10px;
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            #dealer,
+            #player {
+                width: 90%;
+                padding: 15px;
+            }
+
+            .card {
+                width: 60px;
+                height: 90px;
+                font-size: 1.2em;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+
+            #message {
+                font-size: 1em;
+            }
+        }
+
+        /* Новые стили для рекламы */
+        #ad-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #58a6ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        #ad-button:hover {
+            background-color: #3d8bf2;
+        }
+
+        .game-over-message {
+            color: #f00;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Стили для главного меню */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #2e4a3b;
+            /* Darker green */
+        }
+
+        /* Стили для списка проектов */
+        #projects-button {
+            background-color: #8e44ad;
+            /* Purple */
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #projects-button:hover {
+            background-color: #7a3794;
+        }
+
+        /* Стили для кнопки возврата в главное меню */
+        #back-to-menu {
+            margin-top: 20px;
+        }
+
+        /* Кнопка "Начать новую игру" */
+        #new-game-button {
+            display: none;
+        }
+
+        /* Стиль для отображения капитала */
+        #capital {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            margin-right: 10px; /* Отступ справа для разделения с кнопкой рекламы */
+        }
+
+        #capital-value {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            letter-spacing: 1px;
+        }
+
+        #player {
+            min-height: 220px;
+            /* Adjust as needed */
+        }
+
+        /* Общий контейнер для элементов в верхнем правом углу */
+        .top-right-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex; /* Располагаем элементы в строку */
+            align-items: center; /* Выравниваем элементы по вертикали */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Блэкджек</h1>
+
+    <!-- Главное меню -->
+    <div id="main-menu">
+        <h1>Добро пожаловать в Блэкджек!</h1>
+        <button id="start-blackjack">Начать игру</button>
+        <button id="projects-button">Посмотреть другие проекты</button>
+    </div>
+
+    <!-- Игра Блэкджек -->
+    <div id="blackjack-game" style="display: none;">
+         <div class="top-right-container">
+            <div id="capital" style="
+            margin-top: 70px;
+        ">Капитал: <span id="capital-value">10000</span>
+            </div>
+            <button id="ad-button">Смотреть рекламу (+1000)</button>
+        </div>
+        <button id="back-to-menu">Вернуться в главное меню</button>
+
+        <div id="dealer">
+            <h2>Дилер</h2>
+            <div id="dealer-cards"></div>
+            <div id="dealer-score">Счет: 0</div>
+        </div>
+
+        <div id="player">
+
+            <h2>
+                <div id="score">Счет: 0</div>Ты
+            </h2>
+            <div id="cards"></div>
+
+            <div>
+                Ставка:
+                <input type="number" id="bet-input" min="1000" max="100000" value="1000">
+                <button id="start" style="display:none;">Начать игру</button>
+            </div>
+
+            <button id="hit">Взять карту</button>
+            <button id="stand">Пас</button>
+            <button id="new-game-button" style="display: none;">Начать новую игру</button>
+        </div>
+
+        <div id="message"></div>
+
+        <div id="game-over-message" class="game-over-message" style="display: none;">
+            Вы проиграли все деньги!
+        </div>
+    </div>
+
+    <script>
+        let deck = [];
+        let playerHand = [];
+        let dealerHand = [];
+        let playerScore = 0;
+        let dealerScore = 0;
+        let gameStarted = false;
+        let gameOver = false;
+        let capital = localStorage.getItem('blackjackCapital') ? parseInt(localStorage.getItem('blackjackCapital')) : 10000;
+        let betAmount = 1000;
+
+        const suits = ["♥", "♦", "♣", "♠"];
+        const values = ["Т", "2", "3", "4", "5", "6", "7", "8", "9", "10", "В", "Д", "К"];
+
+        const cardsDiv = document.getElementById("cards");
+        const scoreDiv = document.getElementById("score");
+        const dealerCardsDiv = document.getElementById("dealer-cards");
+        const dealerScoreDiv = document.getElementById("dealer-score");
+        const messageDiv = document.getElementById("message");
+        const hitButton = document.getElementById("hit");
+        const standButton = document.getElementById("stand");
+        const startButton = document.getElementById("start");
+        const capitalElement = document.getElementById("capital");
+        const capitalValueSpan = document.getElementById("capital-value");
+        const betInput = document.getElementById("bet-input");
+        const adButton = document.getElementById("ad-button");
+        const gameOverMessage = document.getElementById("game-over-message");
+        const mainMenu = document.getElementById("main-menu");
+        const blackjackGame = document.getElementById("blackjack-game");
+        const startBlackjackButton = document.getElementById("start-blackjack");
+        const projectsButton = document.getElementById("projects-button");
+        const backToMenuButton = document.getElementById("back-to-menu");
+        const newGameButton = document.getElementById("new-game-button");
+
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({
+                        suit: suit,
+                        value: value
+                    });
+                }
+            }
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function dealCard(hand) {
+            const card = deck.pop();
+            hand.push(card);
+            return card;
+        }
+
+        function calculateScore(hand) {
+            let score = 0;
+            let hasAce = false;
+            for (let card of hand) {
+                let cardValue = parseInt(card.value);
+                if (isNaN(cardValue)) {
+                    if (card.value === "Т") {
+                        hasAce = true;
+                        cardValue = 11;
+                    } else {
+                        cardValue = 10;
+                    }
+                }
+                score += cardValue;
+            }
+
+            if (hasAce && score > 21) {
+                score -= 10;
+            }
+            return score;
+        }
+
+        function renderCards() {
+            cardsDiv.innerHTML = "";
+            dealerCardsDiv.innerHTML = "";
+
+            playerHand.forEach(card => {
+                const cardElement = document.createElement("div");
+                cardElement.classList.add("card");
+                cardElement.textContent = card.value + " " + card.suit;
+                cardsDiv.appendChild(cardElement);
+            });
+
+            dealerHand.forEach(card => {
+                const cardElement = document.createElement("div");
+                cardElement.classList.add("card");
+                cardElement.textContent = card.value + " " + card.suit;
+                dealerCardsDiv.appendChild(cardElement);
+            });
+
+            scoreDiv.textContent = "Счет: " + playerScore;
+            dealerScoreDiv.textContent = "Счет: " + dealerScore;
+        }
+
+        function checkBust() {
+            if (playerScore > 21) {
+                messageDiv.textContent = "Перебор! Дилер выиграл.";
+                gameOver = true;
+                endGame();
+            } else if (dealerScore > 21) {
+                messageDiv.textContent = "У дилера перебор! Вы выиграли!";
+                gameOver = true;
+                endGame();
+            }
+        }
+
+        function dealerPlay() {
+            while (dealerScore < 17) {
+                dealCard(dealerHand);
+                dealerScore = calculateScore(dealerHand);
+                renderCards();
+                checkBust();
+                if (gameOver) return;
+            }
+
+            if (dealerScore >= 17) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            gameStarted = false;
+            hitButton.disabled = true;
+            standButton.disabled = true;
+            startButton.style.display = "none";
+            newGameButton.style.display = "block";
+
+            let win = false;
+
+            if (!gameOver) {
+                if (playerScore > dealerScore || dealerScore > 21) {
+                    messageDiv.textContent = "Вы выиграли!";
+                    win = true;
+                } else if (dealerScore > playerScore) {
+                    messageDiv.textContent = "Дилер выиграл!";
+                } else {
+                    messageDiv.textContent = "Ничья!";
+                }
+            }
+
+            if (gameOver && messageDiv.textContent === "Перебор! Дилер выиграл.") {
+                capital -= betAmount;
+            }
+
+            if (win) {
+                capital += betAmount;
+            } else if (messageDiv.textContent === "Дилер выиграл!") {
+                capital -= betAmount;
+            }
+
+            localStorage.setItem('blackjackCapital', capital);
+            capitalValueSpan.textContent = capital;
+        }
+
+        function startGame() {
+            betAmount = parseInt(betInput.value);
+
+            if (isNaN(betAmount) || betAmount < 1000 || betAmount > 100000) {
+                alert("Пожалуйста, введите ставку от 1000 до 100000.");
+                return;
+            }
+
+            if (capital < betAmount) {
+                alert("Недостаточно средств для совершения ставки.");
+                return;
+            }
+
+            gameOverMessage.style.display = "none";
+
+            gameStarted = true;
+            gameOver = false;
+            playerHand = [];
+            dealerHand = [];
+            playerScore = 0;
+            dealerScore = 0;
+            messageDiv.textContent = "";
+            hitButton.disabled = false;
+            standButton.disabled = false;
+            startButton.style.display = "none";
+            newGameButton.style.display = "none";
+
+            createDeck();
+            shuffleDeck();
+
+            dealCard(playerHand);
+            dealCard(dealerHand);
+            dealCard(playerHand);
+            dealCard(dealerHand);
+
+            playerScore = calculateScore(playerHand);
+            dealerScore = calculateScore(dealerHand);
+
+            renderCards();
+            checkBust();
+        }
+
+        hitButton.addEventListener("click", () => {
+            if (!gameStarted || gameOver) return;
+            dealCard(playerHand);
+            playerScore = calculateScore(playerHand);
+            renderCards();
+            checkBust();
+        });
+
+        standButton.addEventListener("click", () => {
+            if (!gameStarted || gameOver) return;
+            dealerPlay();
+        });
+
+        startButton.addEventListener("click", startGame);
+
+        adButton.addEventListener("click", () => {
+            capital += 1000;
+            localStorage.setItem('blackjackCapital', capital);
+            capitalValueSpan.textContent = capital;
+            alert("Спасибо за просмотр рекламы! Вам начислено 1000 валюты.");
+
+            gameOverMessage.style.display = "none";
+
+            hitButton.disabled = false;
+            standButton.disabled = false;
+            startButton.style.display = "none";
+            newGameButton.style.display = "block";
+            gameOver = false;
+        });
+
+        // Обработчики событий для главного меню
+        startBlackjackButton.addEventListener("click", () => {
+            mainMenu.style.display = "none";
+            blackjackGame.style.display = "block";
+            startButton.style.display = "block";
+            capitalValueSpan.textContent = capital; // Устанавливаем начальное значение капитала
+        });
+
+        // Переход к другим проектам
+        projectsButton.addEventListener("click", () => {
+            alert("Здесь будет ссылка на другие проекты!");
+        });
+
+        // Возврат в главное меню
+        backToMenuButton.addEventListener("click", () => {
+            blackjackGame.style.display = "none";
+            mainMenu.style.display = "flex";
+            startButton.style.display = "block";
+        });
+
+        // Начать новую игру
+        newGameButton.addEventListener("click", () => {
+            startGame();
+        });
+
+        // Инициализация состояния кнопок и капитала
+        hitButton.disabled = true;
+        standButton.disabled = true;
+        capitalValueSpan.textContent = capital;
+    </script>
+</body>
+
+</html>
