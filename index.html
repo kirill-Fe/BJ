@@ -191,6 +191,7 @@
         }
 
         #projects-button {
+            display: inline-block; 
             background-color: #8e44ad;
             color: #fff;
             border: none;
@@ -200,6 +201,7 @@
             border-radius: 5px;
             transition: background-color 0.3s ease;
             margin-top: 20px;
+            text-decoration: none; 
         }
 
         #projects-button:hover {
@@ -221,7 +223,7 @@
             background-color: rgba(0, 0, 0, 0.3);
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            margin-right: 10px; 
+            margin-right: 10px;
         }
 
         #capital-value {
@@ -237,8 +239,8 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            display: flex; 
-            align-items: center; 
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -249,15 +251,14 @@
     <div id="main-menu">
         <h1>Добро пожаловать в Блэкджек!</h1>
         <button id="start-blackjack">Начать игру</button>
-        <button id="projects-button">Посмотреть другие проекты</button>
+        <a href="https://kirill-fe.github.io/projects" id="projects-button">Посмотреть другие проекты</a>
     </div>
 
     <div id="blackjack-game" style="display: none;">
-         <div class="top-right-container">
+        <div class="top-right-container">
             <div id="capital" style="
             margin-top: 70px;
-        ">Капитал: <span id="capital-value">10000</span>
-            </div>
+        ">Капитал: <span id="capital-value">10000</span></div>
             <button id="ad-button">Смотреть рекламу (+1000)</button>
         </div>
         <button id="back-to-menu">Вернуться в главное меню</button>
@@ -447,7 +448,7 @@
             }
 
             if (win) {
-                capital += betAmount;
+                capital += betAmount ;
             } else if (messageDiv.textContent === "Дилер выиграл!") {
                 capital -= betAmount;
             }
@@ -532,11 +533,11 @@
             mainMenu.style.display = "none";
             blackjackGame.style.display = "block";
             startButton.style.display = "block";
-            capitalValueSpan.textContent = capital; 
+            capitalValueSpan.textContent = capital;
         });
 
         projectsButton.addEventListener("click", () => {
-            alert("https://kirill-fe.github.io/projects");
+            window.location.href = "https://kirill-fe.github.io/projects";
         });
 
         backToMenuButton.addEventListener("click", () => {
