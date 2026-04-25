@@ -1,325 +1,307 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Блэкджек</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="icon.png" type="image/x-icon">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #35654d;
-            color: #fff;
-            text-align: center;
+        :root {
+            --primary: #8a63f2;
+            --secondary: #63f2c8;
+            --accent: #ff7e5f;
+            --dark-bg: #121212;
+            --darker-card: #1e1e1e;
+            --surface: #252525;
+            --text: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-glow: rgba(138, 99, 242, 0.25);
+            --card-bg: #ffffff;
+            --card-text: #1a1a1a;
+            --header-gradient: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+        [data-theme="light"] {
+            --dark-bg: #f5f7fa;
+            --darker-card: #ffffff;
+            --surface: #eef2f5;
+            --text: #1e293b;
+            --text-secondary: #475569;
+            --border-glow: rgba(138, 99, 242, 0.4);
+            --card-text: #1e1e1e;
+            --card-bg: #ffffff;
+            --header-gradient: linear-gradient(135deg, #8a63f2, #b28eff);
+        }
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            line-height: 1.5;
+            transition: background 0.2s, color 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
-
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        #dealer,
-        #player {
-            margin: 20px;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            width: 80%;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-        }
-
-        h2 {
-            font-size: 2em;
-            margin-bottom: 10px;
-            position: relative;
-            display: inline-block;
-        }
-
-        #cards,
-        #dealer-cards {
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--dark-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        ::selection { background: var(--primary); color: white; }
+        
+        /* Переключатель темы */
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 5px;
             display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 5px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-
-        .card {
-            width: 80px;
-            height: 120px;
-            border: 2px solid #fff;
-            margin: 5px;
-            text-align: center;
-            font-size: 1.5em;
-            background-color: rgba(255, 255, 255, 0.8);
-            color: #000;
-            border-radius: 10px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        .theme-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        button {
-            padding: 12px 24px;
-            font-size: 1em;
-            margin: 5px;
+            font-size: 18px;
             cursor: pointer;
-            background-color: #4CAF50;
+            transition: 0.2s;
             color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+        }
+        .theme-icon.active {
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary);
         }
 
-        button:hover {
-            background-color: #367C39;
-        }
-
-        #message {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-top: 20px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        button:disabled {
-            background-color: #808080;
-            cursor: not-allowed;
-            color: #ccc;
-        }
-
-        button:disabled:hover {
-            background-color: #808080;
-        }
-
-        #score {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.1em;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        #dealer-score {
-            font-size: 1.4em;
-            font-weight: bold;
-        }
-
-        #bet-input {
-            padding: 8px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100px;
-            margin: 0 10px;
-        }
-
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2.5em;
-            }
-
-            #dealer,
-            #player {
-                width: 90%;
-                padding: 15px;
-            }
-
-            .card {
-                width: 60px;
-                height: 90px;
-                font-size: 1.2em;
-            }
-
-            button {
-                padding: 10px 20px;
-                font-size: 0.9em;
-            }
-
-            #message {
-                font-size: 1em;
-            }
-        }
-
-        #ad-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #58a6ff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            font-size: 0.9em;
-            cursor: pointer;
-            border-radius: 4px;
-            margin-left: 10px;
-        }
-
-        #ad-button:hover {
-            background-color: #3d8bf2;
-        }
-
-        .game-over-message {
-            color: #f00;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
+        /* Главное меню */
         #main-menu {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #2e4a3b;
+            background: var(--dark-bg);
+            text-align: center;
         }
-
-        #projects-button {
-            display: inline-block;
-            background-color: #8e44ad;
-            color: #fff;
+        #main-menu h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 2rem;
+        }
+        #start-blackjack, #projects-button {
+            background: linear-gradient(135deg, var(--primary), #a07aff);
             border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
+            transition: all 0.2s;
+            margin: 0.5rem;
             text-decoration: none;
+            display: inline-block;
+        }
+        #start-blackjack:hover, #projects-button:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.05);
+            box-shadow: 0 8px 18px rgba(138,99,242,0.4);
         }
 
-        #projects-button:hover {
-            background-color: #7a3794;
+        /* Игровое поле */
+        #blackjack-game {
+            background: var(--dark-bg);
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-glow);
         }
-
-        #back-to-menu {
-            margin-top: 20px;
-        }
-
-        #new-game-button {
-            display: none;
-        }
-
-        #capital {
-            font-size: 1.2em;
-            font-weight: bold;
-            padding: 8px 12px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            margin-right: 10px;
-        }
-
-        #capital-value {
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            letter-spacing: 1px;
-        }
-
-        #player {
-            min-height: 220px;
-        }
-
         .top-right-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
             display: flex;
             align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 1rem;
         }
-
-        #logo {
-            width: 200px; 
-            height: auto;
-            border-radius: 25px; 
-            display: block;      
-            margin: 0 auto;        
-            margin-bottom: 20px; 
+        #capital {
+            background: var(--surface);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
-
+        #ad-button {
+            background: rgba(88,166,255,0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        #ad-button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        #back-to-menu {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 40px;
+            padding: 6px 14px;
+            color: var(--text);
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+        #dealer, #player {
+            background: var(--darker-card);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-glow);
+            position: relative;
+        }
+        h2 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        #cards, #dealer-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 1rem 0;
+        }
+        .card {
+            width: 80px;
+            height: 120px;
+            background: var(--card-bg);
+            color: var(--card-text);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+        }
+        #score, #dealer-score {
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        button {
+            background: linear-gradient(135deg, var(--primary), #a07aff);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 0 4px;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        #bet-input {
+            background: var(--surface);
+            border: 1px solid var(--border-glow);
+            border-radius: 40px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-weight: 500;
+            width: 120px;
+            text-align: center;
+        }
+        #message {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        .game-over-message {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+        /* реклама */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 2000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.8); 
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
         }
-
         .modal-content {
-            position: relative;
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            animation-name: animatetop;
-            animation-duration: 0.4s
+            background: var(--darker-card);
+            border-radius: 32px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--primary);
+            color: var(--text);
         }
-
         .close {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 10px;
-            color: #aaa;
+            float: right;
             font-size: 28px;
-            font-weight: bold;
             cursor: pointer;
+            color: var(--text-secondary);
         }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        @keyframes animatetop {
-            from {
-                top: -300px;
-                opacity: 0
-            }
-
-            to {
-                top: 0;
-                opacity: 1
-            }
-        }
-
+        .close:hover { color: var(--primary); }
         #adVideo {
             width: 100%;
-            max-height: 400px;
+            border-radius: 20px;
+            margin: 1rem 0;
         }
-
-        #timer {
-            font-size: 1.5em;
-            margin-top: 10px;
+        @media (max-width: 600px) {
+            .card { width: 60px; height: 90px; font-size: 1.2rem; }
+            #blackjack-game { padding: 1rem; margin: 1rem; }
+            h2 { font-size: 1.3rem; }
         }
     </style>
 </head>
-
-<body>
+<body data-theme="dark">
+    <div class="theme-switcher" id="themeSwitcher">
+        <div class="theme-icon active" data-theme="dark">🌙</div>
+        <div class="theme-icon" data-theme="light">☀️</div>
+    </div>
 
     <div id="main-menu">
         <h1>Добро пожаловать в Блэкджек!</h1>
@@ -329,8 +311,7 @@
 
     <div id="blackjack-game" style="display: none;">
         <div class="top-right-container">
-
-            <div id="capital" style="  margin-top: 70px;  ">Капитал: <span id="capital-value">1000</span></div>
+            <div id="capital" style="margin-top:0;">Капитал: <span id="capital-value">0</span></div>
             <button id="ad-button">Смотреть рекламу (+1000)</button>
         </div>
         <button id="back-to-menu">Вернуться в главное меню</button>
@@ -342,276 +323,245 @@
         </div>
 
         <div id="player">
-
-            <h2>
-                <div id="score">Счет: 0</div>Ты
-            </h2>
+            <h2>Ты <div id="score" style="display: inline-block; margin-left: 10px;">Счет: 0</div></h2>
             <div id="cards"></div>
-
             <div>
                 Ставка:
                 <input type="number" id="bet-input" min="1000" max="100000" value="1000">
                 <button id="start" style="display:none;">Начать игру</button>
             </div>
-
-            <button id="hit">Взять карту</button>
-            <button id="stand">Пас</button>
+            <button id="hit" disabled="">Взять карту</button>
+            <button id="stand" disabled="">Пас</button>
             <button id="new-game-button" style="display: none;">Начать новую игру</button>
         </div>
 
         <div id="message"></div>
-
         <div id="game-over-message" class="game-over-message" style="display: none;">
             Вы проиграли все деньги!
         </div>
     </div>
-    <!-- Реклама -->
-<div id="adModal" class="modal">
-    <div class="modal-content" style="
-    background: black;
-">
-        <span class="close" id="closeAdModal">&times;</span>
-        <h2>Хочешь выложить свой контент <br> в клуб Флорика? тогда смотри</h2>
-        <video id="adVideo" controls>
-            <source src="ad.mp4" type="video/mp4">
-            Votre navigateur ne prend pas en charge les vidéos HTML5.
-        </video>
-        <p>Вы сможете закрыть рекламу через <span id="timer">3</span> секунды.</p>
+
+    <div id="adModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAdModal">×</span>
+            <h2>Хочешь выложить свой контент <br> в клуб Флорика? тогда смотри</h2>
+            <video id="adVideo" controls="">
+                <source src="ad.mp4" type="video/mp4">
+                Votre navigateur ne prend pas en charge les vidéos HTML5.
+            </video>
+            <p>Вы сможете закрыть рекламу через <span id="timer">3</span> секунды.</p>
+        </div>
     </div>
-</div>
-    <!-- Исправь баг что бы время после закрытия сохронялось на устройстве таймер -->
+
     <script>
-       let deck = [];
-    let playerHand = [];
-    let dealerHand = [];
-    let playerScore = 0;
-    let dealerScore = 0;
-    let gameStarted = false;
-    let gameOver = false;
-    let capital = localStorage.getItem('blackjackCapital') ? parseInt(localStorage.getItem('blackjackCapital')) : 1000;
-    let betAmount = 0;
+        let deck = [];
+        let playerHand = [];
+        let dealerHand = [];
+        let playerScore = 0;
+        let dealerScore = 0;
+        let gameStarted = false;
+        let gameOver = false;
+        let capital = localStorage.getItem('blackjackCapital') ? parseInt(localStorage.getItem('blackjackCapital')) : 1000;
+        let betAmount = 0;
 
-    const suits = ["♥", "♦", "♣", "♠"];
-    const values = ["Т", "2", "3", "4", "5", "6", "7", "8", "9", "10", "В", "Д", "К"];
+        const suits = ["♥", "♦", "♣", "♠"];
+        const values = ["Т", "2", "3", "4", "5", "6", "7", "8", "9", "10", "В", "Д", "К"];
 
-    const cardsDiv = document.getElementById("cards");
-    const scoreDiv = document.getElementById("score");
-    const dealerCardsDiv = document.getElementById("dealer-cards");
-    const dealerScoreDiv = document.getElementById("dealer-score");
-    const messageDiv = document.getElementById("message");
-    const hitButton = document.getElementById("hit");
-    const standButton = document.getElementById("stand");
-    const startButton = document.getElementById("start");
-    const capitalElement = document.getElementById("capital");
-    const capitalValueSpan = document.getElementById("capital-value");
-    const betInput = document.getElementById("bet-input");
-    const adButton = document.getElementById("ad-button");
-    const gameOverMessage = document.getElementById("game-over-message");
-    const mainMenu = document.getElementById("main-menu");
-    const blackjackGame = document.getElementById("blackjack-game");
-    const startBlackjackButton = document.getElementById("start-blackjack");
-    const projectsButton = document.getElementById("projects-button");
-    const backToMenuButton = document.getElementById("back-to-menu");
-    const newGameButton = document.getElementById("new-game-button");
-    const logo = document.getElementById("logo");
+        const cardsDiv = document.getElementById("cards");
+        const scoreDiv = document.getElementById("score");
+        const dealerCardsDiv = document.getElementById("dealer-cards");
+        const dealerScoreDiv = document.getElementById("dealer-score");
+        const messageDiv = document.getElementById("message");
+        const hitButton = document.getElementById("hit");
+        const standButton = document.getElementById("stand");
+        const startButton = document.getElementById("start");
+        const capitalElement = document.getElementById("capital");
+        const capitalValueSpan = document.getElementById("capital-value");
+        const betInput = document.getElementById("bet-input");
+        const adButton = document.getElementById("ad-button");
+        const gameOverMessage = document.getElementById("game-over-message");
+        const mainMenu = document.getElementById("main-menu");
+        const blackjackGame = document.getElementById("blackjack-game");
+        const startBlackjackButton = document.getElementById("start-blackjack");
+        const projectsButton = document.getElementById("projects-button");
+        const backToMenuButton = document.getElementById("back-to-menu");
+        const newGameButton = document.getElementById("new-game-button");
 
-
-    function createDeck() {
-        deck = [];
-        for (let suit of suits) {
-            for (let value of values) {
-                deck.push({
-                    suit: suit,
-                    value: value
-                });
-            }
-        }
-    }
-
-    function shuffleDeck() {
-        for (let i = deck.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [deck[i], deck[j]] = [deck[j], deck[i]];
-        }
-    }
-
-    function dealCard(hand) {
-        const card = deck.pop();
-        hand.push(card);
-        return card;
-    }
-
-    function calculateScore(hand) {
-        let score = 0;
-        let hasAce = false;
-        for (let card of hand) {
-            let cardValue = parseInt(card.value);
-            if (isNaN(cardValue)) {
-                if (card.value === "Т") {
-                    hasAce = true;
-                    cardValue = 11;
-                } else {
-                    cardValue = 10;
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit: suit, value: value });
                 }
             }
-            score += cardValue;
         }
 
-        if (hasAce && score > 21) {
-            score -= 10;
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
         }
-        return score;
-    }
 
-    function renderCards() {
-        cardsDiv.innerHTML = "";
-        dealerCardsDiv.innerHTML = "";
-
-        playerHand.forEach(card => {
-            const cardElement = document.createElement("div");
-            cardElement.classList.add("card");
-            cardElement.textContent = card.value + " " + card.suit;
-            cardsDiv.appendChild(cardElement);
-        });
-
-        dealerHand.forEach(card => {
-            const cardElement = document.createElement("div");
-            cardElement.classList.add("card");
-            cardElement.textContent = card.value + " " + card.suit;
-            dealerCardsDiv.appendChild(cardElement);
-        });
-
-        scoreDiv.textContent = "Счет: " + playerScore;
-        dealerScoreDiv.textContent = "Счет: " + dealerScore;
-    }
-
-    function checkBust() {
-        if (playerScore > 21) {
-            messageDiv.textContent = "Перебор! Дилер выиграл.";
-            gameOver = true;
-            endGame();
-        } else if (dealerScore > 21) {
-            messageDiv.textContent = "У дилера перебор! Вы выиграли!";
-            gameOver = true;
-            endGame();
+        function dealCard(hand) {
+            const card = deck.pop();
+            hand.push(card);
+            return card;
         }
-    }
 
-    function dealerPlay() {
-        while (dealerScore < 17) {
+        function calculateScore(hand) {
+            let score = 0;
+            let hasAce = false;
+            for (let card of hand) {
+                let cardValue = parseInt(card.value);
+                if (isNaN(cardValue)) {
+                    if (card.value === "Т") {
+                        hasAce = true;
+                        cardValue = 11;
+                    } else {
+                        cardValue = 10;
+                    }
+                }
+                score += cardValue;
+            }
+            if (hasAce && score > 21) {
+                score -= 10;
+            }
+            return score;
+        }
+
+        function renderCards() {
+            cardsDiv.innerHTML = "";
+            dealerCardsDiv.innerHTML = "";
+            playerHand.forEach(card => {
+                const cardElement = document.createElement("div");
+                cardElement.classList.add("card");
+                cardElement.textContent = card.value + " " + card.suit;
+                cardsDiv.appendChild(cardElement);
+            });
+            dealerHand.forEach(card => {
+                const cardElement = document.createElement("div");
+                cardElement.classList.add("card");
+                cardElement.textContent = card.value + " " + card.suit;
+                dealerCardsDiv.appendChild(cardElement);
+            });
+            scoreDiv.textContent = "Счет: " + playerScore;
+            dealerScoreDiv.textContent = "Счет: " + dealerScore;
+        }
+
+        function checkBust() {
+            if (playerScore > 21) {
+                messageDiv.textContent = "Перебор! Дилер выиграл.";
+                gameOver = true;
+                endGame();
+            } else if (dealerScore > 21) {
+                messageDiv.textContent = "У дилера перебор! Вы выиграли!";
+                gameOver = true;
+                endGame();
+            }
+        }
+
+        function dealerPlay() {
+            while (dealerScore < 17) {
+                dealCard(dealerHand);
+                dealerScore = calculateScore(dealerHand);
+                renderCards();
+                checkBust();
+                if (gameOver) return;
+            }
+            if (dealerScore >= 17) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            gameStarted = false;
+            hitButton.disabled = true;
+            standButton.disabled = true;
+            startButton.style.display = "none";
+            newGameButton.style.display = "block";
+
+            let win = false;
+            if (!gameOver) {
+                if (playerScore > dealerScore || dealerScore > 21) {
+                    messageDiv.textContent = "Вы выиграли!";
+                    win = true;
+                } else if (dealerScore > playerScore) {
+                    messageDiv.textContent = "Дилер выиграл!";
+                } else {
+                    messageDiv.textContent = "Ничья!";
+                }
+            }
+            if (gameOver && messageDiv.textContent === "Перебор! Дилер выиграл.") {
+                capital -= betAmount;
+            } else if (messageDiv.textContent === "Дилер выиграл!") {
+                capital -= betAmount;
+            }
+            let winAmount = 0;
+            if (win) {
+                winAmount = betAmount;
+                capital += winAmount;
+                alert("Вы выиграли +" + winAmount + "!");
+            }
+            if (messageDiv.textContent === "У дилера перебор! Вы выиграли!") {
+                winAmount = betAmount;
+                capital += winAmount;
+                alert("У Дилера перебор! Вы выиграли +" + winAmount + "!");
+            }
+            if (capital < 0) capital = 0;
+            localStorage.setItem('blackjackCapital', capital);
+            capitalValueSpan.textContent = capital;
+        }
+
+        function startGame() {
+            betAmount = parseInt(betInput.value);
+            if (isNaN(betAmount) || betAmount < 1000 || betAmount > 100000) {
+                alert("Пожалуйста, введите ставку от 1000 до 100000.");
+                return;
+            }
+            if (capital < betAmount) {
+                alert("Недостаточно средств для совершения ставки.");
+                return;
+            }
+            gameOverMessage.style.display = "none";
+            gameStarted = true;
+            gameOver = false;
+            playerHand = [];
+            dealerHand = [];
+            playerScore = 0;
+            dealerScore = 0;
+            messageDiv.textContent = "";
+            hitButton.disabled = false;
+            standButton.disabled = false;
+            startButton.style.display = "none";
+            newGameButton.style.display = "none";
+            createDeck();
+            shuffleDeck();
+            dealCard(playerHand);
             dealCard(dealerHand);
+            dealCard(playerHand);
+            dealCard(dealerHand);
+            playerScore = calculateScore(playerHand);
             dealerScore = calculateScore(dealerHand);
             renderCards();
             checkBust();
-            if (gameOver) return;
         }
 
-        if (dealerScore >= 17) {
-            endGame();
-        }
-    }
+        hitButton.addEventListener("click", () => {
+            if (!gameStarted || gameOver) return;
+            dealCard(playerHand);
+            playerScore = calculateScore(playerHand);
+            renderCards();
+            checkBust();
+        });
 
-    function endGame() {
-        gameStarted = false;
-        hitButton.disabled = true;
-        standButton.disabled = true;
-        startButton.style.display = "none";
-        newGameButton.style.display = "block";
+        standButton.addEventListener("click", () => {
+            if (!gameStarted || gameOver) return;
+            dealerPlay();
+        });
 
-        let win = false;
-
-        if (!gameOver) {
-            if (playerScore > dealerScore || dealerScore > 21) {
-                messageDiv.textContent = "Вы выиграли!";
-                win = true;
-            } else if (dealerScore > playerScore) {
-                messageDiv.textContent = "Дилер выиграл!";
-            } else {
-                messageDiv.textContent = "Ничья!";
-            }
-        }
-
-        if (gameOver && messageDiv.textContent === "Перебор! Дилер выиграл.") {
-            capital -= betAmount;
-        } else if (messageDiv.textContent === "Дилер выиграл!") {
-            capital -= betAmount;
-        }
-
-        let winAmount = 0;
-        if (win) {
-            winAmount = betAmount;
-            capital += winAmount;
-            alert("Вы выиграли +" + winAmount + "!");
-        }
-        if (messageDiv.textContent === "У дилера перебор! Вы выиграли!") {
-            winAmount = betAmount; 
-            capital += winAmount;
-            alert("У Дилера перебор! Вы выиграли +" + winAmount + "!");
-        }
-
-        localStorage.setItem('blackjackCapital', capital);
-        capitalValueSpan.textContent = capital;
-
-
-    }
-
-    function startGame() {
-        betAmount = parseInt(betInput.value);
-
-        if (isNaN(betAmount) || betAmount < 1000 || betAmount > 100000) {
-            alert("Пожалуйста, введите ставку от 1000 до 100000.");
-            return;
-        }
-
-        if (capital < betAmount) {
-            alert("Недостаточно средств для совершения ставки.");
-            return;
-        }
-
-        gameOverMessage.style.display = "none";
-
-        gameStarted = true;
-        gameOver = false;
-        playerHand = [];
-        dealerHand = [];
-        playerScore = 0;
-        dealerScore = 0;
-        messageDiv.textContent = "";
-        hitButton.disabled = false;
-        standButton.disabled = false;
-        startButton.style.display = "none";
-        newGameButton.style.display = "none";
-
-        createDeck();
-        shuffleDeck();
-
-        dealCard(playerHand);
-        dealCard(dealerHand);
-        dealCard(playerHand);
-        dealCard(dealerHand);
-
-        playerScore = calculateScore(playerHand);
-        dealerScore = calculateScore(dealerHand);
-
-        renderCards();
-        checkBust();
-    }
-
-    hitButton.addEventListener("click", () => {
-        if (!gameStarted || gameOver) return;
-        dealCard(playerHand);
-        playerScore = calculateScore(playerHand);
-        renderCards();
-        checkBust();
-    });
-
-    standButton.addEventListener("click", () => {
-        if (!gameStarted || gameOver) return;
-        dealerPlay();
-    });
-
-    startButton.addEventListener("click", startGame);
-     let adTimer;
+        startButton.addEventListener("click", startGame);
+        let adTimer;
         let adCount = 0;
         let adTimeout = null;
 
@@ -624,24 +574,20 @@
             if (adCount < 3) {
                 if (adTimeout === null || Date.now() >= adTimeout) {
                     let timeLeft = 3;
-
                     timerElement.textContent = timeLeft;
-                   closeAdModal.disabled = true;
-                    adModal.style.display = "block";
+                    closeAdModal.disabled = true;
+                    adModal.style.display = "flex";
                     adVideo.play();
-                     adTimer = setInterval(() => {
-                            timeLeft--;
-                            timerElement.textContent = timeLeft;
-
-                            if (timeLeft <= 0) {
-                                clearInterval(adTimer);
-                                closeAdModal.disabled = false;
-                            }
-                        }, 1000);
-
+                    adTimer = setInterval(() => {
+                        timeLeft--;
+                        timerElement.textContent = timeLeft;
+                        if (timeLeft <= 0) {
+                            clearInterval(adTimer);
+                            closeAdModal.disabled = false;
+                        }
+                    }, 1000);
                     adCount++;
                     adTimeout = Date.now() + 3 * 60 * 1000;
-
                 } else {
                     let timeRemaining = Math.ceil((adTimeout - Date.now()) / 1000);
                     alert("Вы должны подождать " + timeRemaining + " секунд прежде чем смотреть рекламу");
@@ -651,18 +597,14 @@
             }
         });
 
-
         closeAdModal.addEventListener("click", () => {
             adModal.style.display = "none";
             adVideo.pause();
             adVideo.currentTime = 0;
-
             capital += 1000;
             localStorage.setItem('blackjackCapital', capital);
             capitalValueSpan.textContent = capital;
-
             gameOverMessage.style.display = "none";
-
             hitButton.disabled = false;
             standButton.disabled = false;
             startButton.style.display = "none";
@@ -695,8 +637,26 @@
         hitButton.disabled = true;
         standButton.disabled = true;
         capitalValueSpan.textContent = capital;
+
+        // === ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (ДОБАВЛЕНО, НЕ ВЛИЯЕТ НА ЛОГИКУ) ===
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        const themeIcons = document.querySelectorAll('.theme-icon');
+        const body = document.body;
+        function setTheme(theme) {
+            body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeIcons.forEach(icon => {
+                if (icon.getAttribute('data-theme') === theme) icon.classList.add('active');
+                else icon.classList.remove('active');
+            });
+        }
+        themeIcons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                setTheme(icon.getAttribute('data-theme'));
+            });
+        });
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
     </script>
 </body>
-
 </html>
-
